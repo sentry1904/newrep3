@@ -1,14 +1,14 @@
-import plotext as plt
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     # Example data
     categories = ["Development", "Testing", "Documentation", "Deployment"]
     values = [40, 25, 20, 15]
 
-    print("\nPie Chart (Console Output):\n")
-
-    # Plot pie chart directly in terminal
-    plt.pie(values, labels = categories)
+    # Create pie chart
+    plt.figure(figsize=(6, 6))
+    plt.pie(values, labels=categories, autopct="%1.1f%%", startangle=90)
     plt.title("Project Work Distribution")
-    plt.show()
+    plt.show()   # This opens a window with the chart if a GUI is available
+
 
