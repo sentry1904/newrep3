@@ -24,7 +24,7 @@ pipeline {
 
         stage('Run Script') {
             steps {
-                sh 'python3 -m py2.py'
+                sh 'python3 py2.py'
             }
         }
 
