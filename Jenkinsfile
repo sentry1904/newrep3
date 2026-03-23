@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/your-repo/python-app.git'
+                git 'https://github.com/sentry1904/newrep3'
             }
         }
 
