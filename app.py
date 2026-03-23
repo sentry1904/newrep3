@@ -1,18 +1,24 @@
 from flask import Flask, render_template, request
 import os
+import signal
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
-def index():
+def dashboard():
+    message = None
     if request.method == "POST":
         user_input = request.form.get("user_input")
-        # Example: pass input to your script or logic
-        result = f"You entered: {user_input}"
-        return render_template("result.html", result=result)
-    return render_template("index.html")
+
+        if user_input == "100":
+            message = "Pipeline cleanup triggered!"
+            # Exit Flask immediately so Jenkins knows to stop
+            os.kill(os.getpid(), signal.SIGTERM)
+        else:
+            message = f"You entered: {user_input}"
+
+    return render_template("index.html", message=message)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=5000)
 
