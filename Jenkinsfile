@@ -5,7 +5,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main' ,url:'https://github.com/sentry1904/newrep3'
-            }
+		sh git 'pull origin main'            
+}
         }
 
         stage('Build') {
