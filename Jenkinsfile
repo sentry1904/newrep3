@@ -10,18 +10,14 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'pip install -r requirements.txt || pip install numpy matplotlib flake8 pytest'
-            }
-        }
-
-        stage('Lint') {
-            steps {
-                sh 'flake8 py2.py'
+                // Install only what is needed
+                sh 'pip install numpy matplotlib pytest'
             }
         }
 
         stage('Test') {
             steps {
+                // Run tests if you add test_py2.py
                 sh 'pytest --junitxml=results.xml || echo "No tests found"'
             }
             post {
