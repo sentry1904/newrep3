@@ -18,12 +18,7 @@ pipeline {
         stage('Test') {
             steps {
                 // Run tests if you add test_py2.py
-                sh 'pytest --junitxml=results.xml || echo "No tests found"'
-            }
-            post {
-                always {
-                    junit 'results.xml'
-                }
+                sh 'python -m pytest || echo "No tests found"'
             }
         }
 
