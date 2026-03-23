@@ -5,7 +5,7 @@ pipeline {
         stage('Serve UI') {
             steps {
                 // Run Flask in background
-                sh 'nohup python3 app.py > flask.log 2>&1 &'
+                sh 'python3 app.py'
                 echo 'Flask UI is now available at http://192.168.156.31:5000'
             }
         }
