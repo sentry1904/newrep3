@@ -9,6 +9,7 @@ app = Flask(__name__)
 @app.route("/", methods=["GET", "POST"])
 def index():
     message = None
+
     if request.method == "POST":
         user_input = request.form.get("user_input")
         if user_input:
@@ -24,14 +25,18 @@ def index():
 
         # Generate random chart
         values = [random.randint(1, 50) for _ in range(10)]
-        plt.figure(figsize=(6,4))
+        plt.figure(figsize=(6, 4))
         plt.plot(values, marker="o", linestyle="-", color="blue")
         plt.title("Random Values Chart")
         plt.xlabel("Index")
         plt.ylabel("Value")
         plt.grid(True)
 
-        chart_path = os.path.join("static", "chart.png")
+        # Ensure static directory exists
+        chart_dir = os.path.join(app.root_path, "static")
+        os.makedirs(chart_dir, exist_ok=True)
+
+        chart_path = os.path.join(chart_dir, "chart.png")
         plt.savefig(chart_path)
         plt.close()
 
