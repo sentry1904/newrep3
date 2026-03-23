@@ -42,8 +42,7 @@ pipeline {
             steps {
                 // Run Flask app on port 8080 in background
                 sh 'nohup python3 app.py &'
-                echo 'Flask UI is now available at http://<jenkins-server>:8080'
-            }
+                echo 'Flask UI is now available at http://<jenkins-server>:5000'       }
         }
 
         stage('Deploy') {
