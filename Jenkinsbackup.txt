@@ -2,12 +2,6 @@ pipeline {
     agent any
 
     stages {
-        stage('Setup Environment') {
-            steps {
-                sh 'pip3 install -r requirements.txt'
-            }
-        }
-
         stage('Serve UI') {
             steps {
                 // Run Flask in background
@@ -19,7 +13,7 @@ pipeline {
         stage('Monitor Flask Exit') {
             steps {
                 script {
-                    // Check if Flask is running
+                    // Wait for Flask to exit (SIGTERM when input == 100)
                     def status = sh(script: "ps -ef | grep 'python3 app.py' | grep -v grep || true", returnStdout: true).trim()
                     if (status == "") {
                         echo "Flask stopped — performing cleanup"
