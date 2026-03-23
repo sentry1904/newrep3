@@ -18,7 +18,7 @@ pipeline {
         stage('Test') {
             steps {
                 // Run tests if you add test_py2.py
-                sh 'python3 -m pytest || echo "No tests found"'
+                sh 'python3 pytest || echo "No tests found"'
             }
         }
 
