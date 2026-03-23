@@ -18,13 +18,13 @@ pipeline {
         stage('Test') {
             steps {
                 // Run tests if you add test_py2.py
-                sh 'python -m pytest || echo "No tests found"'
+                sh 'python3 -m pytest || echo "No tests found"'
             }
         }
 
         stage('Run Script') {
             steps {
-                sh 'python py2.py'
+                sh 'python3 -m py2.py'
             }
         }
 
