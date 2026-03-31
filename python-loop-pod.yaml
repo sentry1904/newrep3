@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: python-loop-pod
+spec:
+  containers:
+  - name: python-loop-container
+    image: sentry1904/my-python-loop:latest
+    imagePullPolicy: Always
+
