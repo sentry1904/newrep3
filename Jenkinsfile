@@ -1,47 +1,62 @@
 pipeline {
     agent any
 
+    environment {
+        SONARQUBE = 'SonarQubeServer'  // Replace with the name of your SonarQube server configured in Jenkins
+    }
+
     stages {
-        stage('Setup Environment') {
+        stage('Checkout') {
             steps {
-                sh 'pip3 install -r requirements.txt'
+                // Clone your repository using your GitHub username
+                git branch: 'main', url: 'https://github.com/sentry1904/newrep3.git'
             }
         }
 
-        stage('Serve UI') {
+        stage('Build') {
             steps {
-                // Run Flask in background
-                sh 'python3 app.py'
-                echo 'Flask UI is now available at http://192.168.156.31:5000'
+                // Run Python file to verify execution
+                sh 'python3 py1.py'
             }
         }
 
-        stage('Monitor Flask Exit') {
+        stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Check if Flask is running
-                    def status = sh(script: "ps -ef | grep 'python3 app.py' | grep -v grep || true", returnStdout: true).trim()
-                    if (status == "") {
-                        echo "Flask stopped — performing cleanup"
-                        cleanWs()
-                        error("Pipeline stopped due to user input 100")
-                    } else {
-                        echo "Flask still running"
+                    // Run SonarQube scanner
+                    withSonarQubeEnv("${SONARQUBE}") {
+                        sh 'sonar-scanner \
+                            -Dsonar.projectKey=newrep3 \
+                            -Dsonar.projectName=newrep3 \
+                            -Dsonar.sources=. \
+                            -Dsonar.language=py \
+                            -Dsonar.python.version=3'
                     }
                 }
             }
         }
 
-        stage('Archive Logs') {
+        stage('Quality Gate') {
             steps {
-                archiveArtifacts artifacts: 'flask.log', fingerprint: true
+                script {
+                    // Wait for SonarQube quality gate result
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
+                }
             }
         }
     }
 
     post {
         always {
-            echo "Pipeline finished (success or failure)."
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Build and analysis completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check logs.'
         }
     }
 }
