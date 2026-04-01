@@ -38,7 +38,7 @@ pipeline {
             steps {
                 script {
                     // Wait for SonarQube quality gate result
-                    timeout(time: 5, unit: 'MINUTES') {
+                    timeout(time: 20, unit: 'MINUTES') {
                         waitForQualityGate abortPipeline: true
                     }
                 }
