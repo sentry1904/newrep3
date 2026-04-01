@@ -21,20 +21,18 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                script {
-                    // Run SonarQube scanner
-                    withSonarQubeEnv("${SONARQUBE}") {
-                        sh 'sonar-scanner \
-                            -Dsonar.projectKey=newrep3 \
-                            -Dsonar.projectName=newrep3 \
-                            -Dsonar.sources=. \
-                            -Dsonar.language=py \
-                            -Dsonar.python.version=3'
-                    }
-                }
+    steps {
+        script {
+            withSonarQubeEnv("${SONARQUBE}") {
+                sh "${tool 'SonarScanner'}/bin/sonar-scanner \
+                    -Dsonar.projectKey=newrep3 \
+                    -Dsonar.projectName=newrep3 \
+                    -Dsonar.sources=. \
+                    -Dsonar.python.version=3"
             }
         }
+    }
+}
 
         stage('Quality Gate') {
             steps {
