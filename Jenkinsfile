@@ -2,59 +2,42 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE = 'SonarQubeServer'  // Replace with the name of your SonarQube server configured in Jenkins
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds') // Jenkins credential ID
+        IMAGE_NAME = "your-dockerhub-username/newrep3-app1"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Clone your repository using your GitHub username
-                git branch: 'main', url: 'https://github.com/sentry1904/newrep3.git'
+                checkout scm
             }
         }
 
-        stage('Build') {
-            steps {
-                // Run Python file to verify execution
-                sh 'python3 py1.py'
-            }
-        }
-
-        stage('SonarQube Analysis') {
-    steps {
-        script {
-            withSonarQubeEnv("${SONARQUBE}") {
-                sh "${tool 'SonarScanner'}/bin/sonar-scanner \
-                    -Dsonar.projectKey=newrep3 \
-                    -Dsonar.projectName=newrep3 \
-                    -Dsonar.sources=. \
-                    -Dsonar.python.version=3"
-            }
-        }
-    }
-}
-
-        stage('Quality Gate') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // Wait for SonarQube quality gate result
-                    timeout(time: 20, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: true
-                    }
+                    sh "docker build -t ${IMAGE_NAME}:latest ."
                 }
             }
         }
-    }
 
-    post {
-        always {
-            echo 'Pipeline finished.'
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                    sh "docker push ${IMAGE_NAME}:latest"
+                }
+            }
         }
-        success {
-            echo 'Build and analysis completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Please check logs.'
+
+        stage('Pull and Run') {
+            steps {
+                script {
+                    sh "docker pull ${IMAGE_NAME}:latest"
+                    // Run detached, map port 5000
+                    sh "docker run -d -p 5000:5000 --name app1 ${IMAGE_NAME}:latest"
+                }
+            }
         }
     }
 }
