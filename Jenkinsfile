@@ -1,42 +1,26 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds') // Jenkins credential ID
-        IMAGE_NAME = "your-dockerhub-username/newrep3-app1"
-    }
-
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://your-repo-url.git'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Install Requirements') {
             steps {
-                script {
-                    sh "docker build -t ${IMAGE_NAME}:latest ."
-                }
+                sh 'pip install -r requirements.txt'
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Run Flask App') {
             steps {
-                script {
-                    sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
-                    sh "docker push ${IMAGE_NAME}:latest"
-                }
-            }
-        }
-
-        stage('Pull and Run') {
-            steps {
-                script {
-                    sh "docker pull ${IMAGE_NAME}:latest"
-                    // Run detached, map port 5000
-                    sh "docker run -d -p 5000:5000 --name app1 ${IMAGE_NAME}:latest"
-                }
+                sh '''
+                    export FLASK_APP=app.py
+                    export FLASK_ENV=development
+                    python -m flask run --host=0.0.0.0 --port=5000
+                '''
             }
         }
     }
