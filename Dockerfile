@@ -1,16 +1,8 @@
-# Use official Python image
-FROM python:3.10-slim
-
+FROM python:3.9-slim
 WORKDIR /app
-
-# Install Flask
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy app
-COPY app1.py .
-
-EXPOSE 5000
-
-CMD ["python", "app1.py"]
+RUN pip install -r requirements.txt
+COPY . .
+ENV FLASK_APP=app.py
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
 
