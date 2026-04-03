@@ -1,5 +1,5 @@
 pipeline {
-    agent { any }
+    agent any
 
     environment {
         DOCKER_IMAGE = "sentry1904/flask-app"
@@ -35,7 +35,7 @@ pipeline {
                         docker push $DOCKER_IMAGE:$BUILD_NUMBER
 
                         # Enforce max 3 tags: keep latest + 2 most recent build numbers
-                        TAGS=$(curl -s -u "$DOCKER_USER:$DOCKER_PASS" https://hub.docker.com/v2/repositories/$DOCKER_IMAGE/tags/?page_size=100 | grep -o '"name":"[^"]*"' | cut -d'"' -f4 | grep -v latest | sort -n)
+                        TAGS=$(curl -s -u "$DOCKER_USER:$DOCKER_PASS" https://hub.docker.com/v2/repositories/$DOCKER_IMAGE/tags/?page_size=100 | grep -o '"name":"[0-9]*"' | cut -d'"' -f4 | sort -n)
                         COUNT=$(echo "$TAGS" | wc -l)
                         if [ $COUNT -gt 2 ]; then
                           DELETE=$(echo "$TAGS" | head -n1)
@@ -47,9 +47,10 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+        stage('Pull and Run Container') {
             steps {
                 sh '''
+                    docker pull $DOCKER_IMAGE:$DOCKER_TAG
                     docker run -d -p 5000:5000 --name flaskapp $DOCKER_IMAGE:$DOCKER_TAG || true
                     sleep 5
                     echo "Response from Flask app:"
@@ -58,6 +59,12 @@ pipeline {
                     docker logs flaskapp
                 '''
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
         }
     }
 }
