@@ -17,9 +17,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                    docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
-                '''
+                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }
         }
 
@@ -40,9 +38,11 @@ pipeline {
             steps {
                 sh '''
                     docker pull $DOCKER_IMAGE:$DOCKER_TAG
-                    docker run --rm -p 5000:5000 $DOCKER_IMAGE:$DOCKER_TAG &
+                    docker run --rm -d -p 5000:5000 --name flaskapp $DOCKER_IMAGE:$DOCKER_TAG
                     sleep 5
+                    echo "Response from Flask app:"
                     curl -s http://localhost:5000
+                    docker stop flaskapp
                 '''
             }
         }
