@@ -4,7 +4,10 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://your-repo-url.git'
+                // Checkout using HTTPS and Jenkins credentials (PAT stored in Jenkins)
+                git branch: 'main',
+                    url: 'https://github.com/sentry1904/newrep3.git',
+                    credentialsId: 'github-pat-creds'
             }
         }
 
@@ -19,9 +22,15 @@ pipeline {
                 sh '''
                     export FLASK_APP=app.py
                     export FLASK_ENV=development
-                    python -m flask run --host=0.0.0.0 --port=5000
+                    nohup python -m flask run --host=0.0.0.0 --port=5000 &
                 '''
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
         }
     }
 }
